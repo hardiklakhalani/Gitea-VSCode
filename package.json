@@ -92,6 +92,22 @@
                     "description": "The remote gitea instance's url. Append base url to this string eg. http://localhost:8080 or http://localhost/gitea",
                     "pattern": "^(https|http)://"
                 },
+                "gitea.host": {
+                    "scope": "resource",
+                    "type": "string",
+                    "default": "",
+                    "examples": [
+                        "example.com",
+                        "192.168.0.99"
+                    ],
+                    "description": "The remote gitea instance's url without https or http"
+                },
+                "gitea.port": {
+                    "scope": "resource",
+                    "type": "number",
+                    "default": 3100,
+                    "description": "The remote gitea instance's port"
+                },
                 "gitea.owner": {
                     "scope": "resource",
                     "type": "string",
