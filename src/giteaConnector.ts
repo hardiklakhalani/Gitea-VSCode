@@ -66,8 +66,7 @@ export class GiteaConnector {
                 
                 rejectUnauthorized: this.ssl,
                 headers: {
-                    // Authorization: 'token ' + this.authToken,
-                    Authorization: 'token b9c837c0853d28fcde62700ecb85a49036577fa5',
+                    Authorization: 'token ' + this.authToken,
                     Accept: 'application/json;charset=utf-8'
                 },
             };
