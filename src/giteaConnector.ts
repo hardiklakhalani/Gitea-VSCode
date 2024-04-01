@@ -56,6 +56,7 @@ export class GiteaConnector {
         Logger.debug('getEndpoint', 'request', { 'url': endPointPath });
 
         return new Promise<IGiteaResponse>(async (resolve, reject) => {
+            const responseData: Buffer[] = []; // Initialize as an empty array
 
             const requestOptions = {
                 method: 'GET',
@@ -71,16 +72,17 @@ export class GiteaConnector {
                 },
             };
             const req = https.request(requestOptions, (res) => {
-                var responseData: any;
                 res.on('data', (chunk) => {
-                    responseData += chunk;
+                    responseData.push(chunk); // Push each chunk to the array
                 });
 
                 res.on('end', () => {
                     
                     Logger.debug('getEndpoint', 'response', { 'url': endPointPath, 'status': res.statusCode });
-                    resolve(responseData);
-                    console.log('responseData:' + responseData);
+                    const responseDataString = Buffer.concat(responseData).toString(); // Join chunks into a single string
+
+                    const response: IGiteaResponse = { data: JSON.parse(responseDataString) }; // Parse the JSON data
+                    resolve(response);
                 });
             }).on('error', (err) => {
                 this.displayErrorMessage(err.message);
