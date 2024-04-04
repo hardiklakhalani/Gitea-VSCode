@@ -3,6 +3,7 @@ import { workspace, window } from 'vscode';
 interface ConfigStorage {
     token: string;
     instanceURL: string;
+    havingCertificateIssueOnLocalServer: boolean;
     host: string;
     port: number;
     owner: string;
@@ -108,6 +109,14 @@ export class Config implements ConfigTypes {
         return '/api/v1/repos/' +
             this.owner +
             '/' + this.repo + '/issues';
+    }
+    
+    public set havingCertificateIssueOnLocalServer(value) {
+        this.storage.update('havingCertificateIssueOnLocalServer', value);
+    }
+    
+    public get havingCertificateIssueOnLocalServer() {
+        return this.loadConfigValue('havingCertificateIssueOnLocalServer', 'boolean');
     }
 
     public set sslVerify(value) {
