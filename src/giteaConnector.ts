@@ -4,7 +4,7 @@ import axios from 'axios';
 
 import { IGiteaResponse } from './IGiteaResponse';
 import { Logger } from './logger';
-import { Config2 } from './config';
+import { Config } from './config';
 
 export class GiteaConnector {
     private authToken: string;
@@ -16,8 +16,8 @@ export class GiteaConnector {
     }
 
     public async getIssues(repoUri: string, state: string, page: number = 0): Promise<IGiteaResponse> {
-        const config2 = new Config2();
-        return config2.havingCertificateIssueOnLocalServer ?
+        const config = new Config();
+        return config.havingCertificateIssueOnLocalServer ?
         this.getEndpoint2(`${repoUri}?state=${state}&page=${page}`):
         this.getEndpoint(`${repoUri}?state=${state}&page=${page}`);
     }
@@ -39,7 +39,7 @@ export class GiteaConnector {
 
     /// Using https library because of self-signed certificates issue  in axios, this issue was occurring  when using axios with local gitea server running on docker
     private async getEndpoint2(endPointPath: string): Promise<IGiteaResponse> {
-        const config2 = new Config2();
+        const config = new Config();
         Logger.debug('getEndpoint', 'request', { 'url': endPointPath });
 
         return new Promise<IGiteaResponse>(async (resolve, reject) => {
@@ -54,7 +54,7 @@ export class GiteaConnector {
                     const responseDataString = Buffer.concat(responseData).toString(); // Join chunks into a single string
                     const response: IGiteaResponse = { data: JSON.parse(responseDataString) }; // Parse the JSON data
                     resolve(response);
-                    Logger.debug('getEndpoint', 'response', { 'url': config2.host+ ':' + config2.port + endPointPath, 'status': res.statusCode,'size': response.data.length });
+                    Logger.debug('getEndpoint', 'response', { 'url': config.host+ ':' + config.port + endPointPath, 'status': res.statusCode,'size': response.data.length });
                 });
             }).on('error', (err) => {
                 this.displayErrorMessage(err.message);
@@ -84,11 +84,11 @@ export class GiteaConnector {
 
     /// Returns alternative request options for [getEndpoint2] method written above
     private requestOptions2(endPointPath:string): object {
-        const config2 = new Config2();
+        const config = new Config();
         return {
             method: 'GET',
-            hostname: config2.host,
-            port: config2.port,
+            hostname: config.host,
+            port: config.port,
             path: endPointPath,
             
             rejectUnauthorized: this.ssl,

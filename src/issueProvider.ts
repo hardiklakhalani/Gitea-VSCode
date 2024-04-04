@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 
 import { Issue } from './issue';
 import { Config } from './config';
-import { Config2 } from './config';
 import { GiteaConnector } from './giteaConnector';
 import { Logger } from './logger';
 
@@ -25,14 +24,13 @@ export class IssueProvider implements vscode.TreeDataProvider<Issue> {
     public async getIssuesAsync() : Promise<Issue[]> {
         this.issueList = [];
         const config = new Config();
-        const config2 = new Config2();
         const giteaConnector = new GiteaConnector(config.token, config.sslVerify);
 
         const issues = [];
         let page = 1;
         while (page < 11) {
             Logger.log( `Retrieve issues. State: ${this.state} - page ${page}`);
-            const issuesOfPage = (await giteaConnector.getIssues(config2.havingCertificateIssueOnLocalServer ? config2.endPointPath : config.repoApiUrl, this.state, page)).data;
+            const issuesOfPage = (await giteaConnector.getIssues(config.havingCertificateIssueOnLocalServer ? config.endPointPath : config.repoApiUrl, this.state, page)).data;
             Logger.log( `${issuesOfPage.length} issues retrieved (state: ${this.state} - page: ${page})`);
             issues.push(...issuesOfPage);
             issuesOfPage.forEach((c) => {
