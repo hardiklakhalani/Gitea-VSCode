@@ -48,6 +48,7 @@ Otherwise do not push the .vscode folder to your repository and doublecheck this
     , "gitea.port": %YOUR_GITEA_EXPOSED_PORT% // Gitea Remote Exposed Port. Example: 3100 (without quotes)
     , "gitea.owner": "%OWNER%"
     , "gitea.repo": "%REPO_NAME%"
+    , "gitea.sslVerify": false
 ```
 
 ### The following details are needed
