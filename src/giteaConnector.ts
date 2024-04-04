@@ -16,24 +16,10 @@ export class GiteaConnector {
     }
 
     public async getIssues(repoUri: string, state: string, page: number = 0): Promise<IGiteaResponse> {
-        console.log((`${repoUri}?state=${state}&page=${page}`))
         const config = new Config();
         return config.havingCertificateIssueOnLocalServer ?
         this.getEndpoint2(`${repoUri}?state=${state}&page=${page}`):
         this.getEndpoint(`${repoUri}?state=${state}&page=${page}`);
-    }
-
-    private get requestOptions(): object {
-        const agent = new https.Agent({
-            rejectUnauthorized: this.ssl,
-        });
-        return {
-            headers: {
-                Authorization: 'token ' + this.authToken,
-                Accept: 'application/json;charset=utf-8'
-            },
-            // httpsAgent: agent,
-        };
     }
 
     // Using AXIOS
@@ -51,7 +37,7 @@ export class GiteaConnector {
         });
     }
 
-    /// Using https
+    // Using https library because of self-signed certificates issue  in axios, this issue was occurring  when using axios with local gitea server running on docker
     private async getEndpoint2(endPointPath: string): Promise<IGiteaResponse> {
 
         const config = new Config();
@@ -60,7 +46,7 @@ export class GiteaConnector {
         return new Promise<IGiteaResponse>(async (resolve, reject) => {
             const responseData: Buffer[] = []; // Initialize as an empty array
 
-            const requestOptions = {
+            const requestOptions2 = {
                 method: 'GET',
                 hostname: config.host,
                 port: config.port,
@@ -72,7 +58,7 @@ export class GiteaConnector {
                     Accept: 'application/json;charset=utf-8'
                 },
             };
-            const req = https.request(requestOptions, (res) => {
+            const req = https.request(requestOptions2, (res) => {
                 res.on('data', (chunk) => {
                     responseData.push(chunk); // Push each chunk to the array
                 });
@@ -97,11 +83,19 @@ export class GiteaConnector {
 
     private async postEndpoint(url: string): Promise<IGiteaResponse> {
         return new Promise<IGiteaResponse>((resolve, reject) => {
-            // return axios.post(url, this.requestOptions);
+            return axios.post(url, this.requestOptions);
         });
     }
 
-
+    private get requestOptions(): object {
+        const agent = new https.Agent({
+            rejectUnauthorized: this.ssl,
+        });
+        return {
+            headers: {Authorization: 'token ' + this.authToken},
+            httpsAgent: agent,
+        };
+    }
 
     private displayErrorMessage(err: string) {
         vscode.window.showErrorMessage("Error occoured. " + err);
