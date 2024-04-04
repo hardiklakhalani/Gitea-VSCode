@@ -127,7 +127,11 @@ export class Config2 implements ConfigTypes2 {
         return workspace.getConfiguration('gitea', null);
     }
 
-    private loadConfigValue<T extends keyof ConfigStorage2>(configKey: T, type: 'string' | 'boolean' | 'number'): ConfigStorage2[T] {
+    private loadConfigValue<T extends keyof ConfigStorage2>(configKey: T, type: 'string' | 'boolean' | 'number', acceptDetault = false): ConfigStorage2[T] {
+        if (!acceptDetault && !this.storage.has(configKey)) {
+            window.showErrorMessage("Gitea-VSCode didn't find a required configuration value: " + configKey);
+            throw new Error(`Failed to load configuration: "${configKey}"`);
+        }
 
         const value = this.storage.has(configKey)
             ? (this.storage.get(configKey) as ConfigStorage2[T])
