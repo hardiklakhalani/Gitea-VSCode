@@ -17,7 +17,10 @@ export class GiteaConnector {
 
     public async getIssues(repoUri: string, state: string, page: number = 0): Promise<IGiteaResponse> {
         console.log((`${repoUri}?state=${state}&page=${page}`))
-        return this.getEndpoint(`${repoUri}?state=${state}&page=${page}`);
+        const config = new Config();
+        return config.havingCertificateIssueOnLocalServer ?
+        this.getEndpoint2(`${repoUri}?state=${state}&page=${page}`):
+        this.getEndpoint(`${repoUri}?state=${state}&page=${page}`);
     }
 
     private get requestOptions(): object {
@@ -34,22 +37,22 @@ export class GiteaConnector {
     }
 
     // Using AXIOS
-    // private async getEndpoint(url: string): Promise<IGiteaResponse> {
-    //     Logger.debug('getEndpoint', 'request', {'url': url})
-    //     return new Promise<IGiteaResponse>((resolve, reject) => {
-    //         return axios.get(url, this.requestOptions).then((data) => {
-    //             resolve(data);
-    //             Logger.debug('getEndpoint', 'response', {'url': url, 'status': data.status, 'size': data.data.length})
-    //         }).catch((err) => {
-    //             this.displayErrorMessage(err);
-    //             Logger.log(err)
-    //             reject(err);
-    //         });
-    //     });
-    // }
+    private async getEndpoint(url: string): Promise<IGiteaResponse> {
+        Logger.debug('getEndpoint', 'request', {'url': url})
+        return new Promise<IGiteaResponse>((resolve, reject) => {
+            return axios.get(url, this.requestOptions).then((data) => {
+                resolve(data);
+                Logger.debug('getEndpoint', 'response', {'url': url, 'status': data.status, 'size': data.data.length})
+            }).catch((err) => {
+                this.displayErrorMessage(err);
+                Logger.log(err)
+                reject(err);
+            });
+        });
+    }
 
     /// Using https
-    private async getEndpoint(endPointPath: string): Promise<IGiteaResponse> {
+    private async getEndpoint2(endPointPath: string): Promise<IGiteaResponse> {
 
         const config = new Config();
         Logger.debug('getEndpoint', 'request', { 'url': endPointPath });
